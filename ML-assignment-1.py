@@ -33,20 +33,19 @@ def my_bernoulli(bias, n, alpha, expected_value):
             else:
                 bound = 1/float(20*(2*i-1)**2)
         if expected_value == 0.1:
-            if (1.8/float((20*i-2)**2)) == 0:
+            if ((9/5)/float((20*i-2)**2)) == 0:
                 bound = 1
             else:
-                bound = 1.8/float((20*i-2)**2)
+                bound = (9/5)/float((20*i-2)**2)
         if bound >= 1:
             bound = 1
         chebyshev_bound.append(bound)
 
-    plt.plot(alpha,np.array(y)/n,label="")
+    plt.plot(alpha,np.array(y)/n,label="Emperical frequency")
     plt.plot(alpha,markov_bound, label="Markov bound")
     plt.plot(alpha,chebyshev_bound, label="Chebyshev bound")
     plt.legend()
-    plt.title("Emperical frequency with bias= "+str(expected_value))
-
+    plt.title("Emperical frequency with bias "+str(expected_value))
     plt.xlabel("Alpha")
     plt.ylabel("Normalized frequency")
 
@@ -56,7 +55,7 @@ def my_bernoulli(bias, n, alpha, expected_value):
 alphaA = np.arange(0.5,1.05,0.05)
 #my_bernoulli(0.5,10000,alphaA,1/2)
 alphaB = np.arange(0.1,1.05,0.05)
-#my_bernoulli(0.1,10000,alphaB,0.1)
+my_bernoulli(0.1,10000,alphaB,0.1)
 
 
 

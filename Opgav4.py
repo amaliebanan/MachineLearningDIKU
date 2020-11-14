@@ -2,6 +2,7 @@ import numpy as np
 from scipy.stats import bernoulli
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import scipy.spatial as scipy
 
 ############## Opgave 4, K-NN ##############
 #Parser
@@ -23,33 +24,13 @@ labelfile = parse_labelfile("MNIST-Train-Labels-cropped.txt")
 testfile = parse_datafile("MNIST-Test-cropped.txt")
 testlabel = parse_labelfile("MNIST-Test-Labels-cropped.txt")
 
-def tryIt(file):
-    array = file.reshape((28,28)).T
-    plt.imshow(array,cmap='gray',interpolation=None)
-    #plt.show()
-
 
 def euclid_distance(v1,v2):
     return np.sqrt(np.dot((v1-v2).T,(v1-v2)))
 
-
-def find_neighbors(train_set, targetpoint,label_set, k):
-    distances = [(euclid_distance(train_set[i],targetpoint),train_set[i],label_set[i]) for i in range(len(train_set))]
-    sorted_data = sorted(distances)
-    k_neighbors = [sorted_data[i] for i in range(0,k)]
-    return k_neighbors
-
-def predict(train_set,targetpoint,label_set,k,digits):
-    neighbors = find_neighbors(train_set,targetpoint,label_set,k)
-    count = 0
-    for i in range(len(neighbors)):
-        if neighbors[i][2] == digits[0]:
-            count += 1
-    if count >= (len(neighbors)+1)/2:
-        return digits[0]
-    else: return digits[1]
-
-
+def distance_matrix1(v1,trainX):
+    m = np.array([v1,]*len(trainX))
+    return scipy.distance_matrix(m,trainX)
 
 def pick_correct_images(train_set, digits, label_set):
     '''
@@ -70,6 +51,32 @@ digits = [5,6]
 X,Y = pick_correct_images(datafile,digits,labelfile)# X = input, Y = labels
 trainX, valX, trainY, valY = train_test_split(X,Y,test_size=0.2,random_state=42) #Split the dataset into training and val
 
+
+def find_neighbors(train_set, x,label_set, k):
+    '''
+    Calculate distance from x (one 28x28 image) to all other 28x28 images in data set and return the k-nearest ones.
+    :return: Returns the distance, the specific 28x28 and its corresponding label.
+    '''
+    dist_m = distance_matrix1(x,train_set).sum(axis=1)
+    distances = sorted(dist_m)[:k]
+ #   k_neighbors = distances[:k,:]
+  #  if k_neighbors[0][0] == 0.0:
+  #      k_neighbors.pop(0)
+    return distances
+print(find_neighbors(trainX,valX[4],0,5))
+
+def predict(train_set,x,label_set,k,digits):
+    neighbors = find_neighbors(train_set,x,label_set,k)
+    count = 0
+    for i in range(len(neighbors)):
+        if neighbors[i][2] == digits[0]:
+            count += 1
+    if count >= (len(neighbors)+1)/2:
+        return digits[0]
+    else: return digits[1]
+
+
+
 def plot_error_rate(trainX,trainY,valX,valY,digits):
     list_to_plot = []
     for k in range(1,34,2):
@@ -78,16 +85,18 @@ def plot_error_rate(trainX,trainY,valX,valY,digits):
             if predict(trainX,valX[i],trainY,k,digits) != valY[i]: #Get all the misclassifications
                 count += 1
         list_to_plot.append((k,count/len(valY)))#for k, the ratio of misclassifications compared to total length of 28x28 images
-    plt.plot(*zip(*list_to_plot))
-
+    plt.plot(*zip(*list_to_plot),label="Error in %")
+    plt.legend()
+    plt.title("Error as a function of K")
+    plt.xlabel("K")
+    plt.ylabel("Error rate in %")
     plt.show()
-plot_error_rate(trainX,trainY,valX,valY,digits)
+#plot_error_rate(trainX,trainY,valX,valY,digits)
 #print(count,len(valX), count/len(valX))
 
 ##For test files##
 testX,testY = pick_correct_images(testfile,digits,testlabel)
-plot_error_rate(testX,testY,testX,testY,digits)
-
+#plot_error_rate(testX,testY,testX,testY,digits)
 '''
 list_to_plot = []
 for k in range(1,34,2):

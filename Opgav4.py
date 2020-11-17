@@ -1,8 +1,11 @@
 import numpy as np
 from scipy.stats import bernoulli
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report,confusion_matrix
 import matplotlib.pyplot as plt
+from sklearn.neighbors import KNeighborsClassifier
 import scipy.spatial as scipy
+import pandas as pd
 
 ############## Opgave 4, K-NN ##############
 #Parser
@@ -24,14 +27,6 @@ labelfile = parse_labelfile("MNIST-Train-Labels-cropped.txt")
 testfile = parse_datafile("MNIST-Test-cropped.txt")
 testlabel = parse_labelfile("MNIST-Test-Labels-cropped.txt")
 
-
-def euclid_distance(v1,v2):
-    return np.sqrt(np.dot((v1-v2).T,(v1-v2)))
-
-def distance_matrix1(v1,trainX):
-    m = np.array([v1,]*len(trainX))
-    return scipy.distance_matrix(m,trainX)
-
 def pick_correct_images(train_set, digits, label_set):
     '''
     :param train_set: The whole training set cropped
@@ -40,73 +35,53 @@ def pick_correct_images(train_set, digits, label_set):
     :return: Two lists - one with the 28x28 images that equals one of the digits in digit list,
     and one with the corresponding label
     '''
+    tempLabels = []
     input,labels = [],[]
     for i in range(len(train_set)):
         if label_set[i] in digits:
             input.append(train_set[i])
-            labels.append(label_set[i])
+            tempLabels.append(label_set[i])
+    for i in tempLabels:
+        if i == digits[0]:
+            labels.append(-1)
+        else: labels.append(1)
     return input, labels
 
-digits = [5,6]
+digits = [0,8]
 X,Y = pick_correct_images(datafile,digits,labelfile)# X = input, Y = labels
 trainX, valX, trainY, valY = train_test_split(X,Y,test_size=0.2,random_state=42) #Split the dataset into training and val
 
+def predict2(trainx,x,trainy,k):
+    m = np.array([x,]*len(trainx))  #Find distances
+    m1 = trainX - m
+    U = np.dot(m1,m1.T)
+    dist = np.diag(U)
 
-def find_neighbors(train_set, x,label_set, k):
-    '''
-    Calculate distance from x (one 28x28 image) to all other 28x28 images in data set and return the k-nearest ones.
-    :return: Returns the distance, the specific 28x28 and its corresponding label.
-    '''
-    dist_m = distance_matrix1(x,train_set).sum(axis=1)
-    distances = sorted(dist_m)[:k]
- #   k_neighbors = distances[:k,:]
-  #  if k_neighbors[0][0] == 0.0:
-  #      k_neighbors.pop(0)
-    return distances
-print(find_neighbors(trainX,valX[4],0,5))
+    dist_m = np.argsort(dist)[:k] #Get the k-shortests distances by index (k-neighbors)
+    k_nearest_labels = [trainy[dist_m[i]] for i in range(0,k)] #Get labels of the k-shortests distances (k-neighbors)
 
-def predict(train_set,x,label_set,k,digits):
-    neighbors = find_neighbors(train_set,x,label_set,k)
-    count = 0
-    for i in range(len(neighbors)):
-        if neighbors[i][2] == digits[0]:
-            count += 1
-    if count >= (len(neighbors)+1)/2:
-        return digits[0]
-    else: return digits[1]
+    ksum = np.cumsum(k_nearest_labels)[:k]
+    my_predictions = [] #Array of len 33, holding my guess of the label for x for k=1,3,5,7...
 
+    for i in range(1,34,2):
+        if ksum[i-1] > 0:
+            my_predictions.append(1)
+        else: my_predictions.append(-1)
 
+    return my_predictions
 
-def plot_error_rate(trainX,trainY,valX,valY,digits):
-    list_to_plot = []
-    for k in range(1,34,2):
-        count = 0
-        for i in range(len(valX)):
-            if predict(trainX,valX[i],trainY,k,digits) != valY[i]: #Get all the misclassifications
-                count += 1
-        list_to_plot.append((k,count/len(valY)))#for k, the ratio of misclassifications compared to total length of 28x28 images
-    plt.plot(*zip(*list_to_plot),label="Error in %")
-    plt.legend()
-    plt.title("Error as a function of K")
-    plt.xlabel("K")
-    plt.ylabel("Error rate in %")
+def plot_error_rate(trainx,valX,trainy,valY,k):
+    M = []
+    for i in range(len(valX)):
+        M.append(predict2(trainx,valX[i],trainy,k))
+    m = (np.dot(np.dot(valY,M),(-1))+len(valX))/len(valX) #1xn.nx33 = (n-#fejl). Som jeg så ganger (-1) og +n for at få fejl
+
+    plt.plot(range(1,18),m)
     plt.show()
-#plot_error_rate(trainX,trainY,valX,valY,digits)
-#print(count,len(valX), count/len(valX))
+    return m
+
+plot_error_rate(trainX,valX,trainY,valY,33)
 
 ##For test files##
-testX,testY = pick_correct_images(testfile,digits,testlabel)
-#plot_error_rate(testX,testY,testX,testY,digits)
-'''
-list_to_plot = []
-for k in range(1,34,2):
-    count = 0
-    for i in range(len(TestX)):
-        if predict(TestX,TestX[i],TestY,k,digits) == TestY[i]:
-            count += 1
-    list_to_plot.append((k,1-(count/len(TestY))))
-#print(list_to_plot)
-#print(count,len(X1), count/len(Y1))
-#plt.plot(*zip(*list_to_plot))
-#plt.show()
-'''
+#testX,testY = pick_correct_images(testfile,digits,testlabel)
+#plot_error_rate(testX,valX,testY,valY,33)

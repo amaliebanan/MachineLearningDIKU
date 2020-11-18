@@ -9,7 +9,7 @@ x = df['X'].to_numpy().reshape(-1, 1)
 y = df['Y'].to_numpy()
 ylog = np.log(y)
 xsquared = np.sqrt(x)
-ysquared = np.sqrt(y)
+
 
 def calAB(x,y):
     z = np.ones((len(x),1))
@@ -24,20 +24,20 @@ def h(x):
     return np.exp(a*x+b)
 
 x_log_new = [i for i in range(np.min(x),np.max(x)+1)] #Ages 1-12
-y_log_hat = [h(i) for i in x_log_new]    #Calculate the predicted y-label for all ages in x_new
+y_log_hat = [h(i) for i in x_log_new]                 #Calculate the predicted y-label for all ages in x_new
 
-def lossfunc(y,x,h):
-    n = len(y)
+def lossfunc(ylog,x,h):
+    n = len(ylog)
     sum = 0.0
     for i in range(n):
-        sum += (y[i]-h(x[i]))**2
+        sum += (ylog[i]-h(x[i]))**2
     return sum*(1/n)
 
 
-print("MSE log: ",lossfunc(y,x,h))
+print("MSE log: ",lossfunc(ylog,x,h))
+mean = sum(ylog)/len(ylog)
 
-def R2(ylog,y,x,h):
-    mean = sum(ylog)/len(ylog)
+def R2(y,x,h):
     sum1, sum2 = 0.0,0.0
     n = len(x)
     for i in range(n):
@@ -45,7 +45,7 @@ def R2(ylog,y,x,h):
         sum2 += (y[i] - mean)**2
     return 1 - (sum1/sum2)
 
-print("R2 log: ",R2(ylog,y,x,h))
+print("R2 log: ",R2(y,x,h))
 
 a2,b2 = calAB(xsquared,ylog)
 
@@ -56,7 +56,7 @@ x_new_squared = [i for i in range(np.min(x),np.max(x)+1)]
 y_squared_hat = [h2(i) for i in x_new_squared]
 
 print("MSE sqrt: ",lossfunc(y,x,h2))
-print("R2 sqrt: ",R2(ylog,y,x,h2))
+print("R2 sqrt: ",R2(y,x,h2))
 
 plt.plot(x,y,'o',label="measurements")
 plt.plot(xsquared,ylog,'o',label="measurements, squared")

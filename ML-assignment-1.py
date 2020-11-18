@@ -24,6 +24,7 @@ def my_bernoulli(bias, n, alpha, expected_value):
 
     markov_bound = np.array([expected_value/(i) for i in alpha])
     chebyshev_bound = [1]
+    print(alpha)
 
     #Calculate chebyshev bound depending on bias:
     for i in alpha[1:]:
@@ -53,9 +54,9 @@ def my_bernoulli(bias, n, alpha, expected_value):
 
 
 alphaA = np.arange(0.5,1.05,0.05)
-#my_bernoulli(0.5,10000,alphaA,1/2)
+my_bernoulli(0.5,1000,alphaA,1/2)
 alphaB = np.arange(0.1,1.05,0.05)
-my_bernoulli(0.1,10000,alphaB,0.1)
+#my_bernoulli(0.1,100,alphaB,0.1)
 
 
 

@@ -47,7 +47,7 @@ def pick_correct_images(train_set, digits, label_set):
         else: labels.append(1)
     return input, labels
 
-digits = [0,8]
+digits = [5,6]
 X,Y = pick_correct_images(datafile,digits,labelfile)# X = input, Y = labels
 trainX, valX, trainY, valY = train_test_split(X,Y,test_size=0.2,random_state=42) #Split the dataset into training and val
 
@@ -62,7 +62,6 @@ def predict2(trainx,x,trainy,k):
 
     ksum = np.cumsum(k_nearest_labels)[:k]
     my_predictions = [] #Array of len 33, holding my guess of the label for x for k=1,3,5,7...
-
     for i in range(1,34,2):
         if ksum[i-1] > 0:
             my_predictions.append(1)
@@ -73,15 +72,17 @@ def predict2(trainx,x,trainy,k):
 def plot_error_rate(trainx,valX,trainy,valY,k):
     M = []
     for i in range(len(valX)):
-        M.append(predict2(trainx,valX[i],trainy,k))
+        prediction = predict2(trainx,valX[i],trainy,k)
+        M.append(prediction)
     m = (np.dot(np.dot(valY,M),(-1))+len(valX))/len(valX) #1xn.nx33 = (n-#fejl). Som jeg så ganger (-1) og +n for at få fejl
 
-    plt.plot(range(1,18),m)
+    plt.plot(m)
     plt.show()
     return m
 
-plot_error_rate(trainX,valX,trainY,valY,33)
+#plot_error_rate(trainX,valX,trainY,valY,33)
 
 ##For test files##
-#testX,testY = pick_correct_images(testfile,digits,testlabel)
-#plot_error_rate(testX,valX,testY,valY,33)
+testX,testY = pick_correct_images(testfile,digits,testlabel)
+print(len(testX),len(testY))
+plot_error_rate(trainX,testX,trainY,testY,33)

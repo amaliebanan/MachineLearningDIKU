@@ -48,7 +48,7 @@ def my_bernoulli(bias, n, alpha, expected_value):
     plt.legend()
     plt.title("Emperical frequency with bias "+str(expected_value))
     plt.xlabel("Alpha")
-    plt.ylabel("Normalized frequency")
+    plt.ylabel("Probability")
 
     plt.show()
 

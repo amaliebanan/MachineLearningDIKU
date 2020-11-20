@@ -1,11 +1,7 @@
 import numpy as np
-from scipy.stats import bernoulli
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report,confusion_matrix
 import matplotlib.pyplot as plt
-from sklearn.neighbors import KNeighborsClassifier
-import scipy.spatial as scipy
-import pandas as pd
+
 
 ############## Opgave 4, K-NN ##############
 #Parser
@@ -51,7 +47,7 @@ digits = [5,6]
 X,Y = pick_correct_images(datafile,digits,labelfile)# X = input, Y = labels
 trainX, valX, trainY, valY = train_test_split(X,Y,test_size=0.2,random_state=42) #Split the dataset into training and val
 
-def predict2(trainx,x,trainy,k):
+def predict(trainx,x,trainy,k):
     m = np.array([x,]*len(trainx))  #Find distances
     m1 = trainX - m
     U = np.dot(m1,m1.T)
@@ -61,7 +57,8 @@ def predict2(trainx,x,trainy,k):
     k_nearest_labels = [trainy[dist_m[i]] for i in range(0,k)] #Get labels of the k-shortests distances (k-neighbors)
 
     ksum = np.cumsum(k_nearest_labels)[:k]
-    my_predictions = [] #Array of len 33, holding my guess of the label for x for k=1,3,5,7...
+
+    my_predictions = [] #Array of len 17, holding my guess of the label for x for k=1,3,5,7...
     for i in range(1,34,2):
         if ksum[i-1] > 0:
             my_predictions.append(1)
@@ -72,17 +69,23 @@ def predict2(trainx,x,trainy,k):
 def plot_error_rate(trainx,valX,trainy,valY,k):
     M = []
     for i in range(len(valX)):
-        prediction = predict2(trainx,valX[i],trainy,k)
+        prediction = predict(trainx,valX[i],trainy,k)
         M.append(prediction)
-    m = (np.dot(np.dot(valY,M),(-1))+len(valX))/len(valX) #1xn.nx33 = (n-#fejl). Som jeg så ganger (-1) og +n for at få fejl
+    m = (np.dot(np.dot(valY,M),(-1))+len(valX))/len(valX) #1xn.nx17 = (n-#fejl). Som jeg så ganger (-1) og +n for at få fejl
 
-    plt.plot(m)
+    x = [2*i+1 for i in range(0,17)]
+    y = [m[i]*100 for i in range(0,len(m))]
+    plt.plot(x,y)
+    plt.title("KNN algorithm for " +str(digits))
+    plt.xlabel("k")
+    plt.ylabel("Error in %")
+    plt.xticks(np.arange(1,34,2), np.arange(1,34,2))
     plt.show()
     return m
 
-#plot_error_rate(trainX,valX,trainY,valY,33)
+plot_error_rate(trainX,valX,trainY,valY,33)
 
 ##For test files##
 testX,testY = pick_correct_images(testfile,digits,testlabel)
-print(len(testX),len(testY))
-plot_error_rate(trainX,testX,trainY,testY,33)
+#plot_error_rate(trainX,testX,trainY,testY,33)
+

@@ -10,7 +10,6 @@ y = df['Y'].to_numpy()
 ylog = np.log(y)
 xsquared = np.sqrt(x)
 
-
 def calAB(x,y):
     z = np.ones((len(x),1))
     X = np.append(x,z,axis=1)
@@ -20,49 +19,44 @@ def calAB(x,y):
 a,b = calAB(x,ylog)
 print("My prediction model: exp(",a,"* x +",b,") = y")
 
-def h(x):
+def h(x,a,b):
     return np.exp(a*x+b)
 
-x_log_new = [i for i in range(np.min(x),np.max(x)+1)] #Ages 1-12
-y_log_hat = [h(i) for i in x_log_new]                 #Calculate the predicted y-label for all ages in x_new
+y_log_hat = [math.log(h(i,a,b)) for i in x]  #Calculate the predicted y-label for all ages in x_new
 
-def lossfunc(ylog,x,h):
+def lossfunc(ylog,yhat):
     n = len(ylog)
     sum = 0.0
     for i in range(n):
-        sum += (ylog[i]-h(x[i]))**2
+        sum += (ylog[i]-yhat[i])**2
     return sum*(1/n)
 
-
-print("MSE log: ",lossfunc(ylog,x,h))
+print("MSE log: ",lossfunc(ylog,y_log_hat))
 mean = sum(ylog)/len(ylog)
 
-def R2(y,x,h):
+def R2(ylog,yhat):
     sum1, sum2 = 0.0,0.0
-    n = len(x)
+    n = len(yhat)
     for i in range(n):
-        sum1 += (y[i] - h(x[i]))**2
-        sum2 += (y[i] - mean)**2
+        sum1 += (ylog[i] - yhat[i])**2
+        sum2 += (ylog[i] - mean)**2
     return 1 - (sum1/sum2)
 
-print("R2 log: ",R2(y,x,h))
+print("R2 log: ",R2(ylog,y_log_hat))
 
-a2,b2 = calAB(xsquared,ylog)
+w,b2 = calAB(xsquared,ylog)
 
-def h2(x):
-    return np.exp(a2*np.sqrt(x)+b2)
+y_squared_hat = [math.log(h(i,w,b2)) for i in xsquared]
 
-x_new_squared = [i for i in range(np.min(x),np.max(x)+1)]
-y_squared_hat = [h2(i) for i in x_new_squared]
+print("MSE sqrt: ",lossfunc(ylog,y_squared_hat))
+print("R2 sqrt: ",R2(ylog,y_squared_hat))
 
-print("MSE sqrt: ",lossfunc(y,x,h2))
-print("R2 sqrt: ",R2(y,x,h2))
-
-plt.plot(x,y,'o',label="measurements")
-plt.plot(xsquared,ylog,'o',label="measurements, squared")
-plt.plot(x_log_new,y_log_hat,color="blue",label="Linear Regression")
-plt.plot(x_new_squared,y_squared_hat,color="orange",label="Linear Regression squared")
+#plt.plot(x,ylog,'o',label="measurements",color="red")
+#plt.plot(x,y_log_hat, label="Linear regression",color="Blue")
+plt.plot(xsquared,ylog,'o')
+plt.plot(xsquared,y_squared_hat,label="Linear regression, squared",color="Blue")
+plt.title("Linear Regression squared")
 plt.legend()
 plt.xlabel("Age (yrs.)")
-plt.ylabel("PCB Conc. (ppm)")
+plt.ylabel("log(PCB Conc. (ppm))")
 plt.show()

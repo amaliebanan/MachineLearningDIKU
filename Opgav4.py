@@ -76,7 +76,7 @@ def plot_error_rate(trainx,valX,trainy,valY,k):
     x = [2*i+1 for i in range(0,17)]
     y = [m[i]*100 for i in range(0,len(m))]
     plt.plot(x,y)
-    plt.title("KNN algorithm for " +str(digits))
+    plt.title("KNN algorithm for " + str(digits))
     plt.xlabel("k")
     plt.ylabel("Error in %")
     plt.xticks(np.arange(1,34,2), np.arange(1,34,2))

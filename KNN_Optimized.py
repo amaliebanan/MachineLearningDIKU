@@ -43,7 +43,7 @@ def pick_correct_images(train_set, digits, label_set):
         else: labels.append(1)
     return input, labels
 
-digits = [5,6]
+digits = [0,8]
 X,Y = pick_correct_images(datafile,digits,labelfile)# X = input, Y = labels
 trainX, valX, trainY, valY = train_test_split(X,Y,test_size=0.2,random_state=42) #Split the dataset into training and val
 
@@ -75,17 +75,19 @@ def plot_error_rate(trainx,valX,trainy,valY,k):
 
     x = [2*i+1 for i in range(0,17)]
     y = [m[i]*100 for i in range(0,len(m))]
-    plt.plot(x,y)
-    plt.title("KNN algorithm for " + str(digits))
-    plt.xlabel("k")
-    plt.ylabel("Error in %")
-    plt.xticks(np.arange(1,34,2), np.arange(1,34,2))
-    plt.show()
-    return m
 
-plot_error_rate(trainX,valX,trainY,valY,33)
+    return x,y
 
+x1, y1 = plot_error_rate(trainX,valX,trainY,valY,33) #Validation
 ##For test files##
 testX,testY = pick_correct_images(testfile,digits,testlabel)
-#plot_error_rate(trainX,testX,trainY,testY,33)
-
+x2,y2 = plot_error_rate(trainX,testX,trainY,testY,33) #Test
+#Plot
+plt.plot(x1,y1,label="f(k), validation",color="orange")
+plt.plot(x2,y2,label="f(k), test",color="green")
+plt.legend()
+plt.title("KNN algorithm for " + str(digits))
+plt.xlabel("k")
+plt.ylabel("Error in %")
+plt.xticks(np.arange(1,34,2), np.arange(1,34,2))
+plt.show()

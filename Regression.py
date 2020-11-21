@@ -45,17 +45,25 @@ def R2(ylog,yhat):
 print("R2 log: ",R2(ylog,y_log_hat))
 
 w,b2 = calAB(xsquared,ylog)
+print("My prediction model: exp(",w,"* x +",b2,") = y")
 
 y_squared_hat = [math.log(h(i,w,b2)) for i in xsquared]
+
+
+
+my_x = np.linspace(0,14,1000)
+
+my_y = [math.log(h(np.sqrt(i),w,b2)) for i in my_x]
 
 print("MSE sqrt: ",lossfunc(ylog,y_squared_hat))
 print("R2 sqrt: ",R2(ylog,y_squared_hat))
 
 #plt.plot(x,ylog,'o',label="measurements",color="red")
-#plt.plot(x,y_log_hat, label="Linear regression",color="Blue")
-plt.plot(xsquared,ylog,'o')
-plt.plot(xsquared,y_squared_hat,label="Linear regression, squared",color="Blue")
-plt.title("Linear Regression squared")
+plt.plot(x,y_log_hat, label="Linear regression",color="Orange")
+plt.plot(x,ylog,'o')
+plt.plot(my_x,my_y,label="Non-linear regression",color="Green")
+
+plt.title("Regression")
 plt.legend()
 plt.xlabel("Age (yrs.)")
 plt.ylabel("log(PCB Conc. (ppm))")

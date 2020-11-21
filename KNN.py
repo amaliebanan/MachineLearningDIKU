@@ -90,19 +90,3 @@ def plot_error_rate(trainX,trainY,valX,valY,digits):
 
 plot_error_rate(trainX,trainY,valX,valY,digits)
 
-##For test files##
-#testX,testY = pick_correct_images(testfile,digits,testlabel)
-#plot_error_rate(testX,testY,testX,testY,digits)
-'''
-list_to_plot = []
-for k in range(1,34,2):
-    count = 0
-    for i in range(len(TestX)):
-        if predict(TestX,TestX[i],TestY,k,digits) == TestY[i]:
-            count += 1
-    list_to_plot.append((k,1-(count/len(TestY))))
-#print(list_to_plot)
-#print(count,len(X1), count/len(Y1))
-#plt.plot(*zip(*list_to_plot))
-#plt.show()
-'''

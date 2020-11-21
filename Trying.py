@@ -65,7 +65,7 @@ def pick_correct_images(train_set, digits, label_set):
             labels.append(label_set[i])
     return input, labels
 
-digits = [0,8]
+digits = [5,6]
 X,Y = pick_correct_images(datafile,digits,labelfile)# X = input, Y = labels
 trainX, valX, trainY, valY = train_test_split(X,Y,test_size=0.2,random_state=42) #Split the dataset into training and val
 

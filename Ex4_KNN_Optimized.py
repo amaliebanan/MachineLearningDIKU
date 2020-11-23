@@ -66,22 +66,22 @@ def predict(trainx,x,trainy,k):
 
     return my_predictions
 
-def plot_error_rate(trainx,valX,trainy,valY,k):
+def calculateerror(trainx,X,trainy,Y,k):
     M = []
-    for i in range(len(valX)):
-        prediction = predict(trainx,valX[i],trainy,k)
+    for i in range(len(X)):
+        prediction = predict(trainx,X[i],trainy,k)
         M.append(prediction)
-    m = (np.dot(np.dot(valY,M),(-1))+len(valX))/len(valX) #1xn.nx17 = (n-#fejl). Som jeg så ganger (-1) og +n for at få fejl
-
+    m = (np.dot(np.dot(Y,M),(-1))+len(X))/len(X) #1xn.nx17 = (n-#fejl). Som jeg så ganger (-1) og +n for at få fejl
+    
     x = [2*i+1 for i in range(0,17)]
     y = [m[i]*100 for i in range(0,len(m))]
 
     return x,y
 
-x1, y1 = plot_error_rate(trainX,valX,trainY,valY,33) #Validation
+x1, y1 = calculateerror(trainX,valX,trainY,valY,33) #Validation
 ##For test files##
 testX,testY = pick_correct_images(testfile,digits,testlabel)
-x2,y2 = plot_error_rate(trainX,testX,trainY,testY,33) #Test
+x2,y2 = calculateerror(trainX,testX,trainY,testY,33) #Test
 #Plot
 plt.plot(x1,y1,label="f(k), validation",color="orange")
 plt.plot(x2,y2,label="f(k), test",color="green")

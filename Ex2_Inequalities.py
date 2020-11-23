@@ -53,7 +53,7 @@ def my_bernoulli(bias, n, alpha, expected_value):
 
 
 alphaA = np.arange(0.5,1.05,0.05)
-my_bernoulli(0.5,1000000,alphaA,1/2)
+#my_bernoulli(0.5,1000000,alphaA,1/2)
 alphaB = np.arange(0.1,1.05,0.05)
 my_bernoulli(0.1,1000000,alphaB,0.1)
 
